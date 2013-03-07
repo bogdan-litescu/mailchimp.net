@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MailChimp.Net
 {
-    public static class Lists
+    public static class ListsApi
     {
         public static IList<MailingList> GetAll()
         {
@@ -26,8 +26,7 @@ namespace MailChimp.Net
 
         public static MailingList GetByProperty(string propertyName, object propertyValue, ApiKey apiKey = null)
         {
-            if (apiKey == null)
-                apiKey = new ApiKey(); // load from config
+            apiKey = apiKey ?? new ApiKey(); // load from config
 
             var data = new Dictionary<string, object>();
             data["output"] = "json";
@@ -39,6 +38,54 @@ namespace MailChimp.Net
             if (lists != null && lists.MailingLists.Count > 0)
                 return lists.MailingLists[0];
             return null;
+        }
+
+        public static IList<InterestGroup> GetInterestGroups(string listId, ApiKey apiKey = null)
+        {
+            apiKey = apiKey ?? new ApiKey(); // load from config
+
+            var data = new Dictionary<string, object>();
+            data["output"] = "json";
+            data["method"] = "listInterestGroupings";
+            data["apikey"] = apiKey.ToString();
+            data["id"] = listId;
+
+            return JsonConvert.DeserializeObject<IList<InterestGroup>>(HttpUtils.Send(apiKey.Url, data));
+        }
+
+        public static void Subscribe(string listId, Subscriber subscriber, ApiKey apiKey = null)
+        {
+            apiKey = apiKey ?? new ApiKey(); // load from config
+
+            var data = new Dictionary<string, object>();
+            data["output"] = "json";
+            data["method"] = "listSubscribe";
+            data["apikey"] = apiKey.ToString();
+            data["id"] = listId;
+            data["email_address"] = subscriber.Email;
+            data["double_optin"] = "false";
+
+            if (subscriber.UpdateIfExists)
+                data["update_existing"] = "true";
+
+            if (subscriber.AppendInterests)
+                data["replace_interests"] = "false";
+
+            if (!string.IsNullOrEmpty(subscriber.FirstName))
+                data["merge_vars[FNAME]"] = subscriber.FirstName;
+
+            if (!string.IsNullOrEmpty(subscriber.LastName))
+                data["merge_vars[LNAME]"] = subscriber.LastName;
+
+            if (subscriber.InterestGroups.Count > 0) {
+                for (var igroup = 0; igroup < subscriber.InterestGroups.Count; igroup++) {
+                    data["merge_vars[GROUPINGS][" + igroup + "][name]"] = subscriber.InterestGroups[igroup].GroupName;
+                    data["merge_vars[GROUPINGS][" + igroup + "][groups]"] = string.Join(",", subscriber.InterestGroups[igroup].Interests);
+                }
+                
+            }
+
+            HttpUtils.Send(apiKey.Url, data);
         }
 
     }

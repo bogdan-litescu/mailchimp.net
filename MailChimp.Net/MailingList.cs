@@ -16,5 +16,16 @@ namespace MailChimp.Net
 
         [JsonProperty(PropertyName = "date_created")]
         public string DateCreated { get; set; }
+
+        //IList<InterestGroup> _InterestGroups = null;
+        //public IList<InterestGroup> InterestGroups
+        //{
+        //    get {
+        //        if (_InterestGroups == null)
+        //            _InterestGroups = Lists.GetInterestGroups(Id);
+        //        return _InterestGroups;
+        //    }
+        //    set { _InterestGroups = value; }
+        //}
     }
 }

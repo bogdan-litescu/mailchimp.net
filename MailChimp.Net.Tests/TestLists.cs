@@ -16,15 +16,15 @@ namespace MailChimp.Net.Tests
         }
 
         [Test]
-        public void GetOrCreate()
+        public void Get()
         {
             // get by name
-            var list = Lists.GetByName("Test");
+            var list = ListsApi.GetByName("Test");
             Assert.IsNotNull(list);
             Assert.AreEqual("Test", list.Name);
 
             // get by id
-            list = Lists.GetById(list.Id);
+            list = ListsApi.GetById(list.Id);
             Assert.IsNotNull(list);
             Assert.AreEqual("Test", list.Name);
 
