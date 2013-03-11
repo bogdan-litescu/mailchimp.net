@@ -13,6 +13,7 @@ namespace MailChimp.Net
         public bool UpdateIfExists { get; set; }
         public bool AppendInterests { get; set; }
 
+        public IDictionary<string, object> Data { get; set; }
         public IList<SubcriberInterestGroup> InterestGroups { get; set; }
 
         public Subscriber(string email)
@@ -21,6 +22,7 @@ namespace MailChimp.Net
             Email = email;
             UpdateIfExists = true;
             AppendInterests = true;
+            Data = new Dictionary<string, object>();
         }
 
         public Subscriber AddInterest(string groupName, string interestName)
@@ -32,6 +34,12 @@ namespace MailChimp.Net
             } else {
             }
             group.Interests.Add(interestName);
+            return this;
+        }
+
+        public Subscriber SetField(string name, object value)
+        {
+            Data[name] = value;
             return this;
         }
     }

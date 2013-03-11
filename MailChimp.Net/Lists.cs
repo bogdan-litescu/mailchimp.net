@@ -77,6 +77,10 @@ namespace MailChimp.Net
             if (!string.IsNullOrEmpty(subscriber.LastName))
                 data["merge_vars[LNAME]"] = subscriber.LastName;
 
+            // merge other fields
+            foreach (var key in subscriber.Data.Keys)
+                data["merge_vars[" + key + "]"] = subscriber.Data[key];
+
             if (subscriber.InterestGroups.Count > 0) {
                 for (var igroup = 0; igroup < subscriber.InterestGroups.Count; igroup++) {
                     data["merge_vars[GROUPINGS][" + igroup + "][name]"] = subscriber.InterestGroups[igroup].GroupName;

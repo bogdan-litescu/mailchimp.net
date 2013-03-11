@@ -23,7 +23,10 @@ namespace MailChimp.Net.Tests
             Assert.IsNotNull(list);
 
             var subscriber = new Subscriber("test@domain.com") { FirstName = "Test", LastName = "User" };
-            subscriber.AddInterest("Group1", "Value1");
+            subscriber
+                .SetField("TESTFIELD", "test")
+                .AddInterest("Group1", "Value1");
+            
             //subscriber.AddInterest("Group1", "Value2");
             ListsApi.Subscribe(list.Id, subscriber);
 
