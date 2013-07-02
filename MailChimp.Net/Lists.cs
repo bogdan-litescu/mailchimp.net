@@ -1,8 +1,9 @@
 ﻿using MailChimp.Net.Utils;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 
 namespace MailChimp.Net
@@ -34,9 +35,15 @@ namespace MailChimp.Net
             data["apikey"] = apiKey.ToString();
             data["filters["+propertyName+"]"] = propertyValue;
 
-            var lists = JsonConvert.DeserializeObject<MailingListCollection>(HttpUtils.Send(apiKey.Url, data));
-            if (lists != null && lists.MailingLists.Count > 0)
-                return lists.MailingLists[0];
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(MailingListCollection));
+
+            using (MemoryStream ms = new MemoryStream(Encoding.Unicode.GetBytes(HttpUtils.Send(apiKey.Url, data)))) {
+                var lists = serializer.ReadObject(ms) as MailingListCollection;
+                //var lists = JsonConvert.DeserializeObject<MailingListCollection>(HttpUtils.Send(apiKey.Url, data));
+                if (lists != null && lists.MailingLists.Count > 0)
+                    return lists.MailingLists[0];
+            }
+
             return null;
         }
 
@@ -50,7 +57,13 @@ namespace MailChimp.Net
             data["apikey"] = apiKey.ToString();
             data["id"] = listId;
 
-            return JsonConvert.DeserializeObject<IList<InterestGroup>>(HttpUtils.Send(apiKey.Url, data));
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(IList<InterestGroup>));
+
+            using (MemoryStream ms = new MemoryStream(Encoding.Unicode.GetBytes(HttpUtils.Send(apiKey.Url, data)))) {
+                return serializer.ReadObject(ms) as IList<InterestGroup>;
+            }
+
+            //return JsonConvert.DeserializeObject<IList<InterestGroup>>(HttpUtils.Send(apiKey.Url, data));
         }
 
         public static void Subscribe(string listId, Subscriber subscriber, ApiKey apiKey = null)

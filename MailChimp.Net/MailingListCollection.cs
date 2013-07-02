@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace MailChimp.Net
 {
+    [DataContract]
     public class MailingListCollection
     {
         public MailingListCollection()
@@ -13,7 +14,7 @@ namespace MailChimp.Net
             MailingLists = new List<MailingList>();
         }
 
-        [JsonProperty(PropertyName = "data")]
+        [DataMember(Name = "data")]
         public IList<MailingList> MailingLists { get; set; }
 
     }
